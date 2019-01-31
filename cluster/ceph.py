@@ -841,8 +841,8 @@ class Ceph(Cluster):
         # FIXME: Set the pg and pgp size as read from the pool profile in the YAML file!
 
         # set pg, and pgp size for the pools
-        pg_size = profile.get('pg_size', 64)
-        pgp_size = profile.get('pgp_size', 64)
+        pg_size = profile.get('pg_size', 8192)
+        pgp_size = profile.get('pgp_size', 8192)
         
         # get the erasur eprofile if any
         erasure_profile = profile.get('erasure_profile', '')

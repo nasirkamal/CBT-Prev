@@ -256,18 +256,3 @@ There are many additional and powerful ways you can use cbt that are not yet
 covered in this document. As time goes on we will try to provide better examples
 and documentation for these features. For now, it's best to look at the
 examples, look at the code, and ask questions!
-
-## NOTE:
-
-By default new OpenSSH package do not allow more than 10 concurrent SSH sessions. 
-Which may cause problem while running more than 10 concurrent processes or volumes per client.
-To solve this issue edit following parameters in /etc/ssh/sshd_conf.
-
-MaxStartups
-MaxSessions
-
-e.g., MaxSessions 100, MaxStartups 100:30:200.
-
-And restart sshd service using:
-systemctl restart sshd
-
