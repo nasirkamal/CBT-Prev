@@ -849,7 +849,7 @@ class Ceph(Cluster):
         
         # replication 2, 3 etc
         replication = str(profile.get('replication', None))
-
+        expected_num_objects = str(profile.get('expected_num_objects', None))
         # other parameters to make fine tuned pool creation
         ec_overwrites = profile.get('ec_overwrites', False)
         cache_profile = profile.get('cache_profile', None)
@@ -877,13 +877,19 @@ class Ceph(Cluster):
                 common.pdsh(settings.getnodes('head'), 'sudo %s -c %s osd pool set %s allow_ec_overwrites true' % (self.ceph_cmd, self.tmp_conf, name), continue_if_error=False).communicate()
         else:
             # print("ceph_cmd:{}\ntmp_conf:{}\nname:{}\npg_size:{}\npgp_size:{}".format(self.ceph_cmd, self.tmp_conf, name, pg_size, pgp_size))
-            (stdout, stderr) = common.pdsh(settings.getnodes('head'), 'sudo %s -c %s osd pool create %s %d %d' % (self.ceph_cmd, self.tmp_conf, name, pg_size, pgp_size),
-                        continue_if_error=False).communicate()
-            # print("returned data: {}".format((stdout, stderr)))
+#            (stdout, stderr) = common.pdsh(settings.getnodes('head'), 'sudo %s -c %s osd pool create %s %d %d' % (self.ceph_cmd, self.tmp_conf, name, pg_size, pgp_size),continue_if_error=False).communicate()
+#            print("returned data: {}".format((stdout, stderr)))
+            doit = 0
+            try:
+                (stdout, stderr) = common.pdsh(settings.getnodes('head'), 'sudo %s -c %s osd pool create %s %d %d replicated replicated_rule %s' % (self.ceph_cmd, self.tmp_conf, name, pg_size, pgp_size, expected_num_objects),continue_if_error=False).communicate()
+                print("returned data: {}".format((stdout, stderr)))
+                if self.version_compat not in ['argonaut', 'bobcat', 'cuttlefish', 'dumpling', 'emperor', 'firefly', 'giant', 'hammer', 'infernalis', 'jewel']:
+                    common.pdsh(settings.getnodes('head'), 'sudo %s -c %s osd pool application enable %s %s' % (self.ceph_cmd, self.tmp_conf, name, application), continue_if_error=False).communicate()
+            except:
+                (stdout, stderr) = common.pdsh(settings.getnodes('head'), 'sudo %s -c %s osd pool create %s %d %d replicated replicated_rule %s' % (self.ceph_cmd, self.tmp_conf, name, 1024, 1024, expected_num_objects),continue_if_error=False).communicate()
+                doit  = 1
 
         # in case of newer versions (post luminous) pool 'application' option is available to optimize pool usage
-        if self.version_compat not in ['argonaut', 'bobcat', 'cuttlefish', 'dumpling', 'emperor', 'firefly', 'giant', 'hammer', 'infernalis', 'jewel']:
-            common.pdsh(settings.getnodes('head'), 'sudo %s -c %s osd pool application enable %s %s' % (self.ceph_cmd, self.tmp_conf, name, application), continue_if_error=False).communicate()
 
         # setup replicated pool if mentioned
         if replication and replication.isdigit():
@@ -893,10 +899,29 @@ class Ceph(Cluster):
                 pool_min_repl_size = pool_repl_size - 1
 
             # basic command running, this time to create a rep pool
-            common.pdsh(settings.getnodes('head'), 'sudo %s -c %s osd pool set %s size %s' % (self.ceph_cmd, self.tmp_conf, name, replication),
-                        continue_if_error=False).communicate()
-            common.pdsh(settings.getnodes('head'), 'sudo %s -c %s osd pool set %s min_size %d' % (self.ceph_cmd, self.tmp_conf, name, pool_min_repl_size),
-                        continue_if_error=False).communicate()
+            if (doit == 0):
+                common.pdsh(settings.getnodes('head'), 'sudo %s -c %s osd pool set %s size %s' % (self.ceph_cmd, self.tmp_conf, name, replication),continue_if_error=False).communicate()
+            
+            if (doit == 1):
+                itr = (pg_size // 1000) - 2
+                common.pdsh(settings.getnodes('head'), 'sudo %s -c %s osd pool set %s size %s' % (self.ceph_cmd, self.tmp_conf, name, replication),continue_if_error=False).communicate()
+                for i in range(itr):
+                    common.pdsh(settings.getnodes('head'), 'sudo %s -c %s osd pool set %s pg_num %d' % (self.ceph_cmd, self.tmp_conf, name, (i+2)*1000),continue_if_error=False).communicate()
+                common.pdsh(settings.getnodes('head'), 'sudo %s -c %s osd pool set %s pg_num %d' % (self.ceph_cmd, self.tmp_conf, name, pg_size),continue_if_error=False).communicate()
+                common.pdsh(settings.getnodes('head'), 'sudo %s -c %s osd pool set %s pgp_num %d' % (self.ceph_cmd, self.tmp_conf, name, pgp_size),continue_if_error=False).communicate()
+                if self.version_compat not in ['argonaut', 'bobcat', 'cuttlefish', 'dumpling', 'emperor', 'firefly', 'giant', 'hammer', 'infernalis', 'jewel']:
+                    common.pdsh(settings.getnodes('head'), 'sudo %s -c %s osd pool application enable %s %s' % (self.ceph_cmd, self.tmp_conf, name, application), continue_if_error=False).communicate()
+
+#            common.pdsh(settings.getnodes('head'), 'sudo %s -c %s osd pool set %s pg_num 3072' % (self.ceph_cmd, self.tmp_conf, name),continue_if_error=False).communicate()
+#            common.pdsh(settings.getnodes('head'), 'sudo %s -c %s osd pool set %s pg_num 4096' % (self.ceph_cmd, self.tmp_conf, name),continue_if_error=False).communicate()
+#            common.pdsh(settings.getnodes('head'), 'sudo %s -c %s osd pool set %s pgp_num 4096' % (self.ceph_cmd, self.tmp_conf, name),continue_if_error=False).communicate()
+#            common.pdsh(settings.getnodes('head'), 'sudo %s -c %s osd pool set %s pg_num 5000' % (self.ceph_cmd, self.tmp_conf, name),continue_if_error=False).communicate()
+#            common.pdsh(settings.getnodes('head'), 'sudo %s -c %s osd pool set %s pg_num 6000' % (self.ceph_cmd, self.tmp_conf, name),continue_if_error=False).communicate()
+#            common.pdsh(settings.getnodes('head'), 'sudo %s -c %s osd pool set %s pg_num 7000' % (self.ceph_cmd, self.tmp_conf, name),continue_if_error=False).communicate()
+#            common.pdsh(settings.getnodes('head'), 'sudo %s -c %s osd pool set %s pg_num 8192' % (self.ceph_cmd, self.tmp_conf, name),continue_if_error=False).communicate()
+#            common.pdsh(settings.getnodes('head'), 'sudo %s -c %s osd pool set %s pgp_num 8192' % (self.ceph_cmd, self.tmp_conf, name),continue_if_error=False).communicate()
+
+            common.pdsh(settings.getnodes('head'), 'sudo %s -c %s osd pool set %s min_size %d' % (self.ceph_cmd, self.tmp_conf, name, pool_min_repl_size),continue_if_error=False).communicate()
 
         # in case of a crush profile given, setup the crush 'ruleset' on the created pool
         if crush_profile:
