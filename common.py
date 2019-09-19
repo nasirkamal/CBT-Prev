@@ -183,7 +183,7 @@ def make_remote_dir(remote_dir):
     pdsh(nodes, 'sudo mkdir -p -m0775 -- %s' % remote_dir,
          continue_if_error=False).communicate()
     # set correct permissions on the directory to allow fio to write to it 
-    pdsh(nodes, 'sudo chown -R cbt:cbt %s' % remote_dir,
+    pdsh(nodes, 'sudo chown -R ceph-installer:ceph-installer %s' % remote_dir,
      continue_if_error=False).communicate()
 
 # sync up the contents of a remote dir with local dir

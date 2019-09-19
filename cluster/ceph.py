@@ -829,28 +829,13 @@ class Ceph(Cluster):
 
     # making a pool in the remote cluster
     def mkpool(self, name, profile_name, application, base_name=None):
-        """Make a pool with the given name, profile application, and basename (in case of cache tier configuration).\n
-        Frequently check cluster heatlh after every operation as well."""
-
-        # get the list of all the pool profiles listed in the YAML file
         pool_profiles = self.config.get('pool_profiles', {'default': {}})
-        
-        # set the required pool profile by the given name
         profile = pool_profiles.get(profile_name, {})
 
-        # FIXME: Set the pg and pgp size as read from the pool profile in the YAML file!
-
-        # set pg, and pgp size for the pools
-        pg_size = profile.get('pg_size', 8192)
-        pgp_size = profile.get('pgp_size', 8192)
-        
-        # get the erasur eprofile if any
+        pg_size = profile.get('pg_size', 2048)
+        pgp_size = profile.get('pgp_size', 2048)
         erasure_profile = profile.get('erasure_profile', '')
-        
-        # replication 2, 3 etc
         replication = str(profile.get('replication', None))
-        expected_num_objects = str(profile.get('expected_num_objects', None))
-        # other parameters to make fine tuned pool creation
         ec_overwrites = profile.get('ec_overwrites', False)
         cache_profile = profile.get('cache_profile', None)
 
@@ -869,61 +854,28 @@ class Ceph(Cluster):
         prefill_object_size = profile.get('prefill_object_size', 0)
         prefill_time = profile.get('prefill_time', 0)
 
-        # setup an erasure coded pool
         if replication and replication == 'erasure':
             common.pdsh(settings.getnodes('head'), 'sudo %s -c %s osd pool create %s %d %d erasure %s' % (self.ceph_cmd, self.tmp_conf, name, pg_size, pgp_size, erasure_profile),
                         continue_if_error=False).communicate()
             if ec_overwrites is True:
                 common.pdsh(settings.getnodes('head'), 'sudo %s -c %s osd pool set %s allow_ec_overwrites true' % (self.ceph_cmd, self.tmp_conf, name), continue_if_error=False).communicate()
         else:
-            # print("ceph_cmd:{}\ntmp_conf:{}\nname:{}\npg_size:{}\npgp_size:{}".format(self.ceph_cmd, self.tmp_conf, name, pg_size, pgp_size))
-#            (stdout, stderr) = common.pdsh(settings.getnodes('head'), 'sudo %s -c %s osd pool create %s %d %d' % (self.ceph_cmd, self.tmp_conf, name, pg_size, pgp_size),continue_if_error=False).communicate()
-#            print("returned data: {}".format((stdout, stderr)))
-            doit = 0
-            try:
-                (stdout, stderr) = common.pdsh(settings.getnodes('head'), 'sudo %s -c %s osd pool create %s %d %d replicated replicated_rule %s' % (self.ceph_cmd, self.tmp_conf, name, pg_size, pgp_size, expected_num_objects),continue_if_error=False).communicate()
-                print("returned data: {}".format((stdout, stderr)))
-                if self.version_compat not in ['argonaut', 'bobcat', 'cuttlefish', 'dumpling', 'emperor', 'firefly', 'giant', 'hammer', 'infernalis', 'jewel']:
-                    common.pdsh(settings.getnodes('head'), 'sudo %s -c %s osd pool application enable %s %s' % (self.ceph_cmd, self.tmp_conf, name, application), continue_if_error=False).communicate()
-            except:
-                (stdout, stderr) = common.pdsh(settings.getnodes('head'), 'sudo %s -c %s osd pool create %s %d %d replicated replicated_rule %s' % (self.ceph_cmd, self.tmp_conf, name, 1024, 1024, expected_num_objects),continue_if_error=False).communicate()
-                doit  = 1
+            common.pdsh(settings.getnodes('head'), 'sudo %s -c %s osd pool create %s %d %d' % (self.ceph_cmd, self.tmp_conf, name, pg_size, pgp_size),
+                        continue_if_error=False).communicate()
+        if self.version_compat not in ['argonaut', 'bobcat', 'cuttlefish', 'dumpling', 'emperor', 'firefly', 'giant', 'hammer', 'infernalis', 'jewel']:
+            common.pdsh(settings.getnodes('head'), 'sudo %s -c %s osd pool application enable %s %s' % (self.ceph_cmd, self.tmp_conf, name, application), continue_if_error=False).communicate()
 
-        # in case of newer versions (post luminous) pool 'application' option is available to optimize pool usage
-
-        # setup replicated pool if mentioned
         if replication and replication.isdigit():
             pool_repl_size = int(replication)
             pool_min_repl_size = 1
             if (pool_repl_size > 2):
                 pool_min_repl_size = pool_repl_size - 1
 
-            # basic command running, this time to create a rep pool
-            if (doit == 0):
-                common.pdsh(settings.getnodes('head'), 'sudo %s -c %s osd pool set %s size %s' % (self.ceph_cmd, self.tmp_conf, name, replication),continue_if_error=False).communicate()
-            
-            if (doit == 1):
-                itr = (pg_size // 1000) - 2
-                common.pdsh(settings.getnodes('head'), 'sudo %s -c %s osd pool set %s size %s' % (self.ceph_cmd, self.tmp_conf, name, replication),continue_if_error=False).communicate()
-                for i in range(itr):
-                    common.pdsh(settings.getnodes('head'), 'sudo %s -c %s osd pool set %s pg_num %d' % (self.ceph_cmd, self.tmp_conf, name, (i+2)*1000),continue_if_error=False).communicate()
-                common.pdsh(settings.getnodes('head'), 'sudo %s -c %s osd pool set %s pg_num %d' % (self.ceph_cmd, self.tmp_conf, name, pg_size),continue_if_error=False).communicate()
-                common.pdsh(settings.getnodes('head'), 'sudo %s -c %s osd pool set %s pgp_num %d' % (self.ceph_cmd, self.tmp_conf, name, pgp_size),continue_if_error=False).communicate()
-                if self.version_compat not in ['argonaut', 'bobcat', 'cuttlefish', 'dumpling', 'emperor', 'firefly', 'giant', 'hammer', 'infernalis', 'jewel']:
-                    common.pdsh(settings.getnodes('head'), 'sudo %s -c %s osd pool application enable %s %s' % (self.ceph_cmd, self.tmp_conf, name, application), continue_if_error=False).communicate()
+            common.pdsh(settings.getnodes('head'), 'sudo %s -c %s osd pool set %s size %s' % (self.ceph_cmd, self.tmp_conf, name, replication),
+                        continue_if_error=False).communicate()
+            common.pdsh(settings.getnodes('head'), 'sudo %s -c %s osd pool set %s min_size %d' % (self.ceph_cmd, self.tmp_conf, name, pool_min_repl_size),
+                        continue_if_error=False).communicate()
 
-#            common.pdsh(settings.getnodes('head'), 'sudo %s -c %s osd pool set %s pg_num 3072' % (self.ceph_cmd, self.tmp_conf, name),continue_if_error=False).communicate()
-#            common.pdsh(settings.getnodes('head'), 'sudo %s -c %s osd pool set %s pg_num 4096' % (self.ceph_cmd, self.tmp_conf, name),continue_if_error=False).communicate()
-#            common.pdsh(settings.getnodes('head'), 'sudo %s -c %s osd pool set %s pgp_num 4096' % (self.ceph_cmd, self.tmp_conf, name),continue_if_error=False).communicate()
-#            common.pdsh(settings.getnodes('head'), 'sudo %s -c %s osd pool set %s pg_num 5000' % (self.ceph_cmd, self.tmp_conf, name),continue_if_error=False).communicate()
-#            common.pdsh(settings.getnodes('head'), 'sudo %s -c %s osd pool set %s pg_num 6000' % (self.ceph_cmd, self.tmp_conf, name),continue_if_error=False).communicate()
-#            common.pdsh(settings.getnodes('head'), 'sudo %s -c %s osd pool set %s pg_num 7000' % (self.ceph_cmd, self.tmp_conf, name),continue_if_error=False).communicate()
-#            common.pdsh(settings.getnodes('head'), 'sudo %s -c %s osd pool set %s pg_num 8192' % (self.ceph_cmd, self.tmp_conf, name),continue_if_error=False).communicate()
-#            common.pdsh(settings.getnodes('head'), 'sudo %s -c %s osd pool set %s pgp_num 8192' % (self.ceph_cmd, self.tmp_conf, name),continue_if_error=False).communicate()
-
-            common.pdsh(settings.getnodes('head'), 'sudo %s -c %s osd pool set %s min_size %d' % (self.ceph_cmd, self.tmp_conf, name, pool_min_repl_size),continue_if_error=False).communicate()
-
-        # in case of a crush profile given, setup the crush 'ruleset' on the created pool
         if crush_profile:
             try:
               rule_index = int(crush_profile)
@@ -932,30 +884,23 @@ class Ceph(Cluster):
               ruleset = crush_profile
             except ValueError as e:
               ruleset = self.get_ruleset(crush_profile)
-            
-            # bombs away!
             common.pdsh(settings.getnodes('head'), 'sudo %s -c %s osd pool set %s crush_ruleset %s' % (self.ceph_cmd, self.tmp_conf, name, crush_profile),
                         continue_if_error=False).communicate()
 
         logger.info('Checking Healh after pool creation.')
         self.check_health()
 
-        # write data to the pool at the time of creation, this is useful if only running reading benchmarks
-        # or can be any other reason just to get some data going into the pool
         if prefill_objects > 0 or prefill_time > 0:
             logger.info('prefilling %s %sbyte objects into pool %s' % (prefill_objects, prefill_object_size, name))
             common.pdsh(settings.getnodes('head'), 'sudo %s -p %s bench %s write -b %s --max-objects %s --no-cleanup' % (self.rados_cmd, name, prefill_time, prefill_object_size, prefill_objects)).communicate()
-            # check health to see if you messed something up by the writes :D
             self.check_health()
 
-        # set up cache tiering if needed (setup different cache tiers in case of highly hierarchical storage architecture)
         if base_name and cache_mode:
             logger.info("Adding %s as cache tier for %s.", name, base_name)
             common.pdsh(settings.getnodes('head'), 'sudo %s -c %s osd tier add %s %s' % (self.ceph_cmd, self.tmp_conf, base_name, name)).communicate()
             common.pdsh(settings.getnodes('head'), 'sudo %s -c %s osd tier cache-mode %s %s' % (self.ceph_cmd, self.tmp_conf, name, cache_mode)).communicate()
             common.pdsh(settings.getnodes('head'), 'sudo %s -c %s osd tier set-overlay %s %s' % (self.ceph_cmd, self.tmp_conf, base_name, name)).communicate()
 
-        # continuing with the cache tier setup 
         if hit_set_type:
             common.pdsh(settings.getnodes('head'), 'sudo %s -c %s osd pool set %s hit_set_type %s' % (self.ceph_cmd, self.tmp_conf, name, hit_set_type)).communicate()
         if hit_set_count:
@@ -972,7 +917,6 @@ class Ceph(Cluster):
             common.pdsh(settings.getnodes('head'), 'sudo %s -c %s osd pool set %s min_write_recency_for_promote %s' % (self.ceph_cmd, self.tmp_conf, name, min_write_recency_for_promote)).communicate()
 
         logger.info('Final Pool Health Check.')
-        # really seeing if we messed up
         self.check_health()
 
         # If there is a cache profile assigned, make a cache pool
@@ -980,7 +924,6 @@ class Ceph(Cluster):
             cache_name = '%s-cache' % name
             self.mkpool(cache_name, cache_profile, name, application)
 
-    # delete a pool in the remote cluster
     def rmpool(self, name, profile_name):
         """Delete an existing pool with a given name and profile. Also handles cache tier configurations for the pools,"""
         # get pool profile array
@@ -1013,12 +956,12 @@ class Ceph(Cluster):
         common.pdsh(settings.getnodes('clients'), 'sudo service rbdmap stop').communicate()
 
     # make a new image in RBD pool with the given params
-    def mkimage(self, name, size, pool, data_pool, order):
+    def mkimage(self, name, size, pool, data_pool, object_size):
         """Simply create a new image in the RBD pool"""
         dp_option = ''
         if data_pool:
             dp_option = "--data-pool %s" % data_pool
-        common.pdsh(settings.getnodes('head'), '%s -c %s create %s --size %s --pool %s %s --order %s' % (self.rbd_cmd, self.tmp_conf, name, size, pool, dp_option, order)).communicate()
+        common.pdsh(settings.getnodes('head'), '%s -c %s create %s --size %s --pool %s %s --object-size %s' % (self.rbd_cmd, self.tmp_conf, name, size, pool, dp_option, object_size)).communicate()
 
     # auth_urls needed for RADOSGW related stuff
     def get_auth_urls(self):

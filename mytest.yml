@@ -1,0 +1,43 @@
+cluster:
+  user: 'ceph-installer'
+  head: "admin"
+  clients: ["admin"]
+  osds: ["stor0","stor1","stor2"]
+  mons: ["stor0","stor1","stor2"]
+  osds_per_node: 1
+  fs: 'xfs'
+  mkfs_opts: '-f -i size=2048 -n size=8k'
+  mount_opts: 'noatime,nodiratime,attr2,logbufs=8,logbsize=256k,largeio,inode64,swalloc'
+  conf_file: '/etc/ceph/ceph.conf'
+  iterations: 1
+  use_existing: True
+  rebuild_every_test: True
+  clusterid: ”ceph"
+  tmp_dir: "/tmp/cbt"
+  pool_profiles:
+    rbd3rep:
+      pg_size: 2048
+      pgp_size: 2048
+      replication: 2
+      expected_num_objects: 300000
+benchmarks:
+  librbdfio:
+      iterations: 1
+      clientname: admin
+      time: 600
+      ramp: 15
+      iodepth: [32]
+      numjobs: 1
+      mode: [randread]
+      ioengine: posixaio
+      rwmixread: 70
+      op_size: [4096] #, 8192]
+      vol_size: 10240
+      direct: 1
+      buffered: 0
+      use_dir: True
+      output-format: json
+      volumes_per_client: 10
+      fio_cmd: '/usr/bin/fio'
+      pool_profile: rbd2rep
+
