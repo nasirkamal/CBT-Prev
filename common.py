@@ -170,7 +170,7 @@ def clean_remote_dir (remote_dir):
     # get the list of all nodes given in the YAML file
     nodes = settings.getnodes('clients', 'osds', 'mons', 'rgws', 'mds')
     # run the subprocess to get rid of the directory data
-    pdsh(nodes, 'if [ -d "%s" ]; then rm -rf %s; fi' % (remote_dir, remote_dir),
+    pdsh(nodes, 'if [ -d "%s" ]; then sudo rm -rf %s; fi' % (remote_dir, remote_dir),
          continue_if_error=False).communicate()
 
 # create a given directory on each cluster node
