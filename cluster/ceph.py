@@ -961,7 +961,7 @@ class Ceph(Cluster):
         dp_option = ''
         if data_pool:
             dp_option = "--data-pool %s" % data_pool
-        common.pdsh(settings.getnodes('head'), '%s -c %s create %s --size %s --pool %s %s --object-size %s' % (self.rbd_cmd, self.tmp_conf, name, size, pool, dp_option, object_size)).communicate()
+        common.pdsh(settings.getnodes('head'), '%s -c %s create %s --size %s --pool %s %s --order %s' % (self.rbd_cmd, self.tmp_conf, name, size, pool, dp_option, object_size)).communicate()
 
     # auth_urls needed for RADOSGW related stuff
     def get_auth_urls(self):

@@ -171,7 +171,7 @@ def clean_remote_dir (remote_dir):
     nodes = settings.getnodes('clients', 'osds', 'mons', 'rgws', 'mds')
     # run the subprocess to get rid of the directory data
     pdsh(nodes, 'if [ -d "%s" ]; then rm -rf %s; fi' % (remote_dir, remote_dir),
-         continue_if_error=True).communicate()
+         continue_if_error=False).communicate()
 
 # create a given directory on each cluster node
 def make_remote_dir(remote_dir):
@@ -183,7 +183,7 @@ def make_remote_dir(remote_dir):
     pdsh(nodes, 'sudo mkdir -p -m0775 -- %s' % remote_dir,
          continue_if_error=False).communicate()
     # set correct permissions on the directory to allow fio to write to it 
-    pdsh(nodes, 'sudo chown -R ceph-installer:ceph-installer %s' % remote_dir,
+    pdsh(nodes, 'sudo chown -R cbt:cbt %s' % remote_dir,
      continue_if_error=False).communicate()
 
 # sync up the contents of a remote dir with local dir

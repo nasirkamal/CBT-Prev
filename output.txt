@@ -1,0 +1,178 @@
+00:22:30 - DEBUG    - cbt      - Settings.cluster:
+    {'archive_dir': '/root/results_cbt',
+     'clients': ['nova0', 'east', 'west'],
+     'clusterid': 'ceph',
+     'conf_file': '/etc/ceph/ceph.conf',
+     'head': 'nova0',
+     'iterations': 1,
+     'mon': ['stor0', 'stor1', 'stor2'],
+     'osds': ['stor0', 'stor1', 'stor2'],
+     'osds_per_node': 1,
+     'pool_profiles': {'rbd2rep': {'pg_size': 2048,
+                                   'pgp_size': 2048,
+                                   'replication': 2}},
+     'rebuild_every_test': True,
+     'tmp_dir': '/home/cbt/cbt',
+     'use_existing': True,
+     'user': 'cbt'}
+00:22:30 - DEBUG    - cbt      - Nodes : cbt@stor2,cbt@stor0,cbt@stor1
+00:22:30 - DEBUG    - cbt      - Nodes : cbt@west,cbt@east,cbt@nova0
+00:22:30 - DEBUG    - cbt      - Nodes : cbt@east,cbt@nova0,cbt@west,cbt@stor2,cbt@stor0,cbt@stor1
+00:22:30 - INFO     - cbt      - Deleting /home/cbt/cbt/ceph
+00:22:30 - DEBUG    - cbt      - CheckedPopen continue_if_error=True args=pdsh -f 6 -R ssh -w cbt@east,cbt@nova0,cbt@west,cbt@stor2,cbt@stor0,cbt@stor1 sudo rm -rf /home/cbt/cbt/ceph
+00:22:31 - DEBUG    - cbt      - Nodes : cbt@east,cbt@nova0,cbt@west,cbt@stor2,cbt@stor0,cbt@stor1
+00:22:31 - DEBUG    - cbt      - CheckedPopen continue_if_error=True args=pdsh -f 6 -R ssh -w cbt@east,cbt@nova0,cbt@west,cbt@stor2,cbt@stor0,cbt@stor1 if [ -d "/home/cbt/cbt/00000000/LibrbdFio/osd_ra-00004096/op_size-00004096/concurrent_procs-030/iodepth-032/randread" ]; then rm -rf /home/cbt/cbt/00000000/LibrbdFio/osd_ra-00004096/op_size-00004096/concurrent_procs-030/iodepth-032/randread; fi
+00:22:31 - DEBUG    - cbt      - Nodes : cbt@east,cbt@nova0,cbt@west,cbt@stor2,cbt@stor0,cbt@stor1
+00:22:31 - DEBUG    - cbt      - CheckedPopen continue_if_error=False args=pdsh -S -f 6 -R ssh -w cbt@east,cbt@nova0,cbt@west,cbt@stor2,cbt@stor0,cbt@stor1 sudo mkdir -p -m0775 -- /home/cbt/cbt/00000000/LibrbdFio/osd_ra-00004096/op_size-00004096/concurrent_procs-030/iodepth-032/randread
+00:22:31 - DEBUG    - cbt      - CheckedPopen continue_if_error=False args=pdsh -S -f 6 -R ssh -w cbt@east,cbt@nova0,cbt@west,cbt@stor2,cbt@stor0,cbt@stor1 sudo chown -R cbt:cbt /home/cbt/cbt/00000000/LibrbdFio/osd_ra-00004096/op_size-00004096/concurrent_procs-030/iodepth-032/randread
+00:22:31 - INFO     - cbt      - Pausing for 60s for idle monitoring.
+00:23:31 - DEBUG    - cbt      - Nodes : cbt@east,cbt@nova0,cbt@west,cbt@stor2,cbt@stor0,cbt@stor1
+00:23:31 - DEBUG    - cbt      - CheckedPopen continue_if_error=False args=pdsh -S -f 6 -R ssh -w cbt@east,cbt@nova0,cbt@west,cbt@stor2,cbt@stor0,cbt@stor1 sudo chown -R cbt.cbt /home/cbt/cbt/00000000/LibrbdFio/osd_ra-00004096/op_size-00004096/concurrent_procs-030/iodepth-032/randread/*
+00:23:32 - WARNING  - cbt      - Exception in common.py @sync_files checked_Popen args=['pdsh', '-S', '-f', '6', '-R', 'ssh', '-w', 'cbt@east,cbt@nova0,cbt@west,cbt@stor2,cbt@stor0,cbt@stor1', 'sudo chown -R cbt.cbt /home/cbt/cbt/00000000/LibrbdFio/osd_ra-00004096/op_size-00004096/concurrent_procs-030/iodepth-032/randread/*'] continue_if_error=False rtncode=1
+stdout:
+
+stderr
+nova0: chown: cannot access ‘/home/cbt/cbt/00000000/LibrbdFio/osd_ra-00004096/op_size-00004096/concurrent_procs-030/iodepth-032/randread/*’: No such file or directory
+pdsh@nova0: nova0: ssh exited with exit code 1
+east: chown: cannot access ‘/home/cbt/cbt/00000000/LibrbdFio/osd_ra-00004096/op_size-00004096/concurrent_procs-030/iodepth-032/randread/*’: No such file or directory
+west: chown: cannot access ‘/home/cbt/cbt/00000000/LibrbdFio/osd_ra-00004096/op_size-00004096/concurrent_procs-030/iodepth-032/randread/*’: No such file or directory
+pdsh@nova0: east: ssh exited with exit code 1
+pdsh@nova0: west: ssh exited with exit code 1
+stor1: chown: cannot access ‘/home/cbt/cbt/00000000/LibrbdFio/osd_ra-00004096/op_size-00004096/concurrent_procs-030/iodepth-032/randread/*’: No such file or directory
+pdsh@nova0: stor1: ssh exited with exit code 1
+stor0: chown: cannot access ‘/home/cbt/cbt/00000000/LibrbdFio/osd_ra-00004096/op_size-00004096/concurrent_procs-030/iodepth-032/randread/*’: No such file or directory
+stor2: chown: cannot access ‘/home/cbt/cbt/00000000/LibrbdFio/osd_ra-00004096/op_size-00004096/concurrent_procs-030/iodepth-032/randread/*’: No such file or directory
+pdsh@nova0: stor2: ssh exited with exit code 1
+pdsh@nova0: stor0: ssh exited with exit code 1
+
+00:23:32 - DEBUG    - cbt      - CheckedPopen continue_if_error=False args=rpdcp -f 10 -R ssh -w cbt@east,cbt@nova0,cbt@west,cbt@stor2,cbt@stor0,cbt@stor1 -r /home/cbt/cbt/00000000/LibrbdFio/osd_ra-00004096/op_size-00004096/concurrent_procs-030/iodepth-032/randread/* /root/results_cbt/results/00000000/id2503940497084235408
+00:23:32 - DEBUG    - cbt      - Nodes : cbt@nova0
+00:23:32 - DEBUG    - cbt      - CheckedPopen continue_if_error=False args=pdsh -S -f 1 -R ssh -w cbt@nova0 sudo /usr/bin/ceph -c /etc/ceph/ceph.conf osd pool delete cbt-librbdfio cbt-librbdfio --yes-i-really-really-mean-it
+00:23:32 - DEBUG    - cbt      - Nodes : cbt@nova0
+00:23:32 - DEBUG    - cbt      - CheckedPopen continue_if_error=False args=pdsh -S -f 1 -R ssh -w cbt@nova0 sudo /usr/bin/ceph -c /etc/ceph/ceph.conf osd pool create cbt-librbdfio 2048 2048
+00:23:33 - DEBUG    - cbt      - Nodes : cbt@nova0
+00:23:33 - DEBUG    - cbt      - CheckedPopen continue_if_error=False args=pdsh -S -f 1 -R ssh -w cbt@nova0 sudo /usr/bin/ceph -c /etc/ceph/ceph.conf osd pool application enable cbt-librbdfio rbd
+00:23:34 - DEBUG    - cbt      - Nodes : cbt@nova0
+00:23:34 - DEBUG    - cbt      - CheckedPopen continue_if_error=False args=pdsh -S -f 1 -R ssh -w cbt@nova0 sudo /usr/bin/ceph -c /etc/ceph/ceph.conf osd pool set cbt-librbdfio size 2
+00:23:35 - DEBUG    - cbt      - Nodes : cbt@nova0
+00:23:35 - DEBUG    - cbt      - CheckedPopen continue_if_error=False args=pdsh -S -f 1 -R ssh -w cbt@nova0 sudo /usr/bin/ceph -c /etc/ceph/ceph.conf osd pool set cbt-librbdfio min_size 1
+00:23:36 - INFO     - cbt      - Checking Healh after pool creation.
+00:23:41 - DEBUG    - cbt      - Nodes : cbt@nova0
+00:23:41 - DEBUG    - cbt      - CheckedPopen continue_if_error=True args=pdsh -f 1 -R ssh -w cbt@nova0 /usr/bin/ceph -c /etc/ceph/ceph.conf health 
+00:23:42 - INFO     - cbt      - Final Pool Health Check.
+00:23:47 - DEBUG    - cbt      - Nodes : cbt@nova0
+00:23:47 - DEBUG    - cbt      - CheckedPopen continue_if_error=True args=pdsh -f 1 -R ssh -w cbt@nova0 /usr/bin/ceph -c /etc/ceph/ceph.conf health 
+00:23:47 - DEBUG    - cbt      - Nodes : cbt@west,cbt@east,cbt@nova0
+00:23:47 - DEBUG    - cbt      - CheckedPopen continue_if_error=True args=pdsh -f 3 -R ssh -w cbt@west,cbt@east,cbt@nova0 hostname -f
+00:23:47 - DEBUG    - cbt      - Nodes : cbt@nova0
+00:23:47 - DEBUG    - cbt      - CheckedPopen continue_if_error=True args=pdsh -f 1 -R ssh -w cbt@nova0 /usr/bin/rbd -c /etc/ceph/ceph.conf create cbt-librbdfio-nova0-0 --size 20480 --pool cbt-librbdfio  --object-size 22
+00:23:48 - DEBUG    - cbt      - Nodes : cbt@nova0
+00:23:48 - DEBUG    - cbt      - CheckedPopen continue_if_error=True args=pdsh -f 1 -R ssh -w cbt@nova0 /usr/bin/rbd -c /etc/ceph/ceph.conf create cbt-librbdfio-nova0-1 --size 20480 --pool cbt-librbdfio  --object-size 22
+00:23:48 - DEBUG    - cbt      - Nodes : cbt@nova0
+00:23:48 - DEBUG    - cbt      - CheckedPopen continue_if_error=True args=pdsh -f 1 -R ssh -w cbt@nova0 /usr/bin/rbd -c /etc/ceph/ceph.conf create cbt-librbdfio-nova0-2 --size 20480 --pool cbt-librbdfio  --object-size 22
+00:23:48 - DEBUG    - cbt      - Nodes : cbt@nova0
+00:23:48 - DEBUG    - cbt      - CheckedPopen continue_if_error=True args=pdsh -f 1 -R ssh -w cbt@nova0 /usr/bin/rbd -c /etc/ceph/ceph.conf create cbt-librbdfio-nova0-3 --size 20480 --pool cbt-librbdfio  --object-size 22
+00:23:49 - DEBUG    - cbt      - Nodes : cbt@nova0
+00:23:49 - DEBUG    - cbt      - CheckedPopen continue_if_error=True args=pdsh -f 1 -R ssh -w cbt@nova0 /usr/bin/rbd -c /etc/ceph/ceph.conf create cbt-librbdfio-nova0-4 --size 20480 --pool cbt-librbdfio  --object-size 22
+00:23:49 - DEBUG    - cbt      - Nodes : cbt@nova0
+00:23:49 - DEBUG    - cbt      - CheckedPopen continue_if_error=True args=pdsh -f 1 -R ssh -w cbt@nova0 /usr/bin/rbd -c /etc/ceph/ceph.conf create cbt-librbdfio-nova0-5 --size 20480 --pool cbt-librbdfio  --object-size 22
+00:23:49 - DEBUG    - cbt      - Nodes : cbt@nova0
+00:23:49 - DEBUG    - cbt      - CheckedPopen continue_if_error=True args=pdsh -f 1 -R ssh -w cbt@nova0 /usr/bin/rbd -c /etc/ceph/ceph.conf create cbt-librbdfio-nova0-6 --size 20480 --pool cbt-librbdfio  --object-size 22
+00:23:49 - DEBUG    - cbt      - Nodes : cbt@nova0
+00:23:49 - DEBUG    - cbt      - CheckedPopen continue_if_error=True args=pdsh -f 1 -R ssh -w cbt@nova0 /usr/bin/rbd -c /etc/ceph/ceph.conf create cbt-librbdfio-nova0-7 --size 20480 --pool cbt-librbdfio  --object-size 22
+00:23:50 - DEBUG    - cbt      - Nodes : cbt@nova0
+00:23:50 - DEBUG    - cbt      - CheckedPopen continue_if_error=True args=pdsh -f 1 -R ssh -w cbt@nova0 /usr/bin/rbd -c /etc/ceph/ceph.conf create cbt-librbdfio-nova0-8 --size 20480 --pool cbt-librbdfio  --object-size 22
+00:23:50 - DEBUG    - cbt      - Nodes : cbt@nova0
+00:23:50 - DEBUG    - cbt      - CheckedPopen continue_if_error=True args=pdsh -f 1 -R ssh -w cbt@nova0 /usr/bin/rbd -c /etc/ceph/ceph.conf create cbt-librbdfio-nova0-9 --size 20480 --pool cbt-librbdfio  --object-size 22
+00:23:50 - DEBUG    - cbt      - Nodes : cbt@nova0
+00:23:50 - DEBUG    - cbt      - CheckedPopen continue_if_error=True args=pdsh -f 1 -R ssh -w cbt@nova0 /usr/bin/rbd -c /etc/ceph/ceph.conf create cbt-librbdfio-west-0 --size 20480 --pool cbt-librbdfio  --object-size 22
+00:23:50 - DEBUG    - cbt      - Nodes : cbt@nova0
+00:23:50 - DEBUG    - cbt      - CheckedPopen continue_if_error=True args=pdsh -f 1 -R ssh -w cbt@nova0 /usr/bin/rbd -c /etc/ceph/ceph.conf create cbt-librbdfio-west-1 --size 20480 --pool cbt-librbdfio  --object-size 22
+00:23:51 - DEBUG    - cbt      - Nodes : cbt@nova0
+00:23:51 - DEBUG    - cbt      - CheckedPopen continue_if_error=True args=pdsh -f 1 -R ssh -w cbt@nova0 /usr/bin/rbd -c /etc/ceph/ceph.conf create cbt-librbdfio-west-2 --size 20480 --pool cbt-librbdfio  --object-size 22
+00:23:51 - DEBUG    - cbt      - Nodes : cbt@nova0
+00:23:51 - DEBUG    - cbt      - CheckedPopen continue_if_error=True args=pdsh -f 1 -R ssh -w cbt@nova0 /usr/bin/rbd -c /etc/ceph/ceph.conf create cbt-librbdfio-west-3 --size 20480 --pool cbt-librbdfio  --object-size 22
+00:23:51 - DEBUG    - cbt      - Nodes : cbt@nova0
+00:23:51 - DEBUG    - cbt      - CheckedPopen continue_if_error=True args=pdsh -f 1 -R ssh -w cbt@nova0 /usr/bin/rbd -c /etc/ceph/ceph.conf create cbt-librbdfio-west-4 --size 20480 --pool cbt-librbdfio  --object-size 22
+00:23:52 - DEBUG    - cbt      - Nodes : cbt@nova0
+00:23:52 - DEBUG    - cbt      - CheckedPopen continue_if_error=True args=pdsh -f 1 -R ssh -w cbt@nova0 /usr/bin/rbd -c /etc/ceph/ceph.conf create cbt-librbdfio-west-5 --size 20480 --pool cbt-librbdfio  --object-size 22
+00:23:52 - DEBUG    - cbt      - Nodes : cbt@nova0
+00:23:52 - DEBUG    - cbt      - CheckedPopen continue_if_error=True args=pdsh -f 1 -R ssh -w cbt@nova0 /usr/bin/rbd -c /etc/ceph/ceph.conf create cbt-librbdfio-west-6 --size 20480 --pool cbt-librbdfio  --object-size 22
+00:23:52 - DEBUG    - cbt      - Nodes : cbt@nova0
+00:23:52 - DEBUG    - cbt      - CheckedPopen continue_if_error=True args=pdsh -f 1 -R ssh -w cbt@nova0 /usr/bin/rbd -c /etc/ceph/ceph.conf create cbt-librbdfio-west-7 --size 20480 --pool cbt-librbdfio  --object-size 22
+00:23:52 - DEBUG    - cbt      - Nodes : cbt@nova0
+00:23:52 - DEBUG    - cbt      - CheckedPopen continue_if_error=True args=pdsh -f 1 -R ssh -w cbt@nova0 /usr/bin/rbd -c /etc/ceph/ceph.conf create cbt-librbdfio-west-8 --size 20480 --pool cbt-librbdfio  --object-size 22
+00:23:53 - DEBUG    - cbt      - Nodes : cbt@nova0
+00:23:53 - DEBUG    - cbt      - CheckedPopen continue_if_error=True args=pdsh -f 1 -R ssh -w cbt@nova0 /usr/bin/rbd -c /etc/ceph/ceph.conf create cbt-librbdfio-west-9 --size 20480 --pool cbt-librbdfio  --object-size 22
+00:23:53 - DEBUG    - cbt      - Nodes : cbt@nova0
+00:23:53 - DEBUG    - cbt      - CheckedPopen continue_if_error=True args=pdsh -f 1 -R ssh -w cbt@nova0 /usr/bin/rbd -c /etc/ceph/ceph.conf create cbt-librbdfio-east-0 --size 20480 --pool cbt-librbdfio  --object-size 22
+00:23:53 - DEBUG    - cbt      - Nodes : cbt@nova0
+00:23:53 - DEBUG    - cbt      - CheckedPopen continue_if_error=True args=pdsh -f 1 -R ssh -w cbt@nova0 /usr/bin/rbd -c /etc/ceph/ceph.conf create cbt-librbdfio-east-1 --size 20480 --pool cbt-librbdfio  --object-size 22
+00:23:53 - DEBUG    - cbt      - Nodes : cbt@nova0
+00:23:53 - DEBUG    - cbt      - CheckedPopen continue_if_error=True args=pdsh -f 1 -R ssh -w cbt@nova0 /usr/bin/rbd -c /etc/ceph/ceph.conf create cbt-librbdfio-east-2 --size 20480 --pool cbt-librbdfio  --object-size 22
+00:23:54 - DEBUG    - cbt      - Nodes : cbt@nova0
+00:23:54 - DEBUG    - cbt      - CheckedPopen continue_if_error=True args=pdsh -f 1 -R ssh -w cbt@nova0 /usr/bin/rbd -c /etc/ceph/ceph.conf create cbt-librbdfio-east-3 --size 20480 --pool cbt-librbdfio  --object-size 22
+00:23:54 - DEBUG    - cbt      - Nodes : cbt@nova0
+00:23:54 - DEBUG    - cbt      - CheckedPopen continue_if_error=True args=pdsh -f 1 -R ssh -w cbt@nova0 /usr/bin/rbd -c /etc/ceph/ceph.conf create cbt-librbdfio-east-4 --size 20480 --pool cbt-librbdfio  --object-size 22
+00:23:54 - DEBUG    - cbt      - Nodes : cbt@nova0
+00:23:54 - DEBUG    - cbt      - CheckedPopen continue_if_error=True args=pdsh -f 1 -R ssh -w cbt@nova0 /usr/bin/rbd -c /etc/ceph/ceph.conf create cbt-librbdfio-east-5 --size 20480 --pool cbt-librbdfio  --object-size 22
+00:23:55 - DEBUG    - cbt      - Nodes : cbt@nova0
+00:23:55 - DEBUG    - cbt      - CheckedPopen continue_if_error=True args=pdsh -f 1 -R ssh -w cbt@nova0 /usr/bin/rbd -c /etc/ceph/ceph.conf create cbt-librbdfio-east-6 --size 20480 --pool cbt-librbdfio  --object-size 22
+00:23:55 - DEBUG    - cbt      - Nodes : cbt@nova0
+00:23:55 - DEBUG    - cbt      - CheckedPopen continue_if_error=True args=pdsh -f 1 -R ssh -w cbt@nova0 /usr/bin/rbd -c /etc/ceph/ceph.conf create cbt-librbdfio-east-7 --size 20480 --pool cbt-librbdfio  --object-size 22
+00:23:55 - DEBUG    - cbt      - Nodes : cbt@nova0
+00:23:55 - DEBUG    - cbt      - CheckedPopen continue_if_error=True args=pdsh -f 1 -R ssh -w cbt@nova0 /usr/bin/rbd -c /etc/ceph/ceph.conf create cbt-librbdfio-east-8 --size 20480 --pool cbt-librbdfio  --object-size 22
+00:23:55 - DEBUG    - cbt      - Nodes : cbt@nova0
+00:23:55 - DEBUG    - cbt      - CheckedPopen continue_if_error=True args=pdsh -f 1 -R ssh -w cbt@nova0 /usr/bin/rbd -c /etc/ceph/ceph.conf create cbt-librbdfio-east-9 --size 20480 --pool cbt-librbdfio  --object-size 22
+00:23:56 - INFO     - cbt      - Attempting to populating fio files...
+00:23:56 - DEBUG    - cbt      - Nodes : cbt@west,cbt@east,cbt@nova0
+00:23:56 - DEBUG    - cbt      - CheckedPopen continue_if_error=False args=pdsh -S -f 3 -R ssh -w cbt@west,cbt@east,cbt@nova0 sudo /usr/bin/fio --ioengine=rbd --clientname=admin --pool=cbt-librbdfio --rbdname=cbt-librbdfio-`hostname -f`-0 --invalidate=0  --rw=write --numjobs=1 --bs=4M --size 20480M --name=cbt-librbdfio-`hostname -f`-file-0  --output-format=json,normal > /dev/null
+00:23:56 - DEBUG    - cbt      - Nodes : cbt@west,cbt@east,cbt@nova0
+00:23:56 - DEBUG    - cbt      - CheckedPopen continue_if_error=False args=pdsh -S -f 3 -R ssh -w cbt@west,cbt@east,cbt@nova0 sudo /usr/bin/fio --ioengine=rbd --clientname=admin --pool=cbt-librbdfio --rbdname=cbt-librbdfio-`hostname -f`-1 --invalidate=0  --rw=write --numjobs=1 --bs=4M --size 20480M --name=cbt-librbdfio-`hostname -f`-file-0  --output-format=json,normal > /dev/null
+00:23:56 - DEBUG    - cbt      - Nodes : cbt@west,cbt@east,cbt@nova0
+00:23:56 - DEBUG    - cbt      - CheckedPopen continue_if_error=False args=pdsh -S -f 3 -R ssh -w cbt@west,cbt@east,cbt@nova0 sudo /usr/bin/fio --ioengine=rbd --clientname=admin --pool=cbt-librbdfio --rbdname=cbt-librbdfio-`hostname -f`-2 --invalidate=0  --rw=write --numjobs=1 --bs=4M --size 20480M --name=cbt-librbdfio-`hostname -f`-file-0  --output-format=json,normal > /dev/null
+00:23:56 - DEBUG    - cbt      - Nodes : cbt@west,cbt@east,cbt@nova0
+00:23:56 - DEBUG    - cbt      - CheckedPopen continue_if_error=False args=pdsh -S -f 3 -R ssh -w cbt@west,cbt@east,cbt@nova0 sudo /usr/bin/fio --ioengine=rbd --clientname=admin --pool=cbt-librbdfio --rbdname=cbt-librbdfio-`hostname -f`-3 --invalidate=0  --rw=write --numjobs=1 --bs=4M --size 20480M --name=cbt-librbdfio-`hostname -f`-file-0  --output-format=json,normal > /dev/null
+00:23:56 - DEBUG    - cbt      - Nodes : cbt@west,cbt@east,cbt@nova0
+00:23:56 - DEBUG    - cbt      - CheckedPopen continue_if_error=False args=pdsh -S -f 3 -R ssh -w cbt@west,cbt@east,cbt@nova0 sudo /usr/bin/fio --ioengine=rbd --clientname=admin --pool=cbt-librbdfio --rbdname=cbt-librbdfio-`hostname -f`-4 --invalidate=0  --rw=write --numjobs=1 --bs=4M --size 20480M --name=cbt-librbdfio-`hostname -f`-file-0  --output-format=json,normal > /dev/null
+00:23:56 - DEBUG    - cbt      - Nodes : cbt@west,cbt@east,cbt@nova0
+00:23:56 - DEBUG    - cbt      - CheckedPopen continue_if_error=False args=pdsh -S -f 3 -R ssh -w cbt@west,cbt@east,cbt@nova0 sudo /usr/bin/fio --ioengine=rbd --clientname=admin --pool=cbt-librbdfio --rbdname=cbt-librbdfio-`hostname -f`-5 --invalidate=0  --rw=write --numjobs=1 --bs=4M --size 20480M --name=cbt-librbdfio-`hostname -f`-file-0  --output-format=json,normal > /dev/null
+00:23:56 - DEBUG    - cbt      - Nodes : cbt@west,cbt@east,cbt@nova0
+00:23:56 - DEBUG    - cbt      - CheckedPopen continue_if_error=False args=pdsh -S -f 3 -R ssh -w cbt@west,cbt@east,cbt@nova0 sudo /usr/bin/fio --ioengine=rbd --clientname=admin --pool=cbt-librbdfio --rbdname=cbt-librbdfio-`hostname -f`-6 --invalidate=0  --rw=write --numjobs=1 --bs=4M --size 20480M --name=cbt-librbdfio-`hostname -f`-file-0  --output-format=json,normal > /dev/null
+00:23:56 - DEBUG    - cbt      - Nodes : cbt@west,cbt@east,cbt@nova0
+00:23:56 - DEBUG    - cbt      - CheckedPopen continue_if_error=False args=pdsh -S -f 3 -R ssh -w cbt@west,cbt@east,cbt@nova0 sudo /usr/bin/fio --ioengine=rbd --clientname=admin --pool=cbt-librbdfio --rbdname=cbt-librbdfio-`hostname -f`-7 --invalidate=0  --rw=write --numjobs=1 --bs=4M --size 20480M --name=cbt-librbdfio-`hostname -f`-file-0  --output-format=json,normal > /dev/null
+00:23:56 - DEBUG    - cbt      - Nodes : cbt@west,cbt@east,cbt@nova0
+00:23:56 - DEBUG    - cbt      - CheckedPopen continue_if_error=False args=pdsh -S -f 3 -R ssh -w cbt@west,cbt@east,cbt@nova0 sudo /usr/bin/fio --ioengine=rbd --clientname=admin --pool=cbt-librbdfio --rbdname=cbt-librbdfio-`hostname -f`-8 --invalidate=0  --rw=write --numjobs=1 --bs=4M --size 20480M --name=cbt-librbdfio-`hostname -f`-file-0  --output-format=json,normal > /dev/null
+00:23:56 - DEBUG    - cbt      - Nodes : cbt@west,cbt@east,cbt@nova0
+00:23:56 - DEBUG    - cbt      - CheckedPopen continue_if_error=False args=pdsh -S -f 3 -R ssh -w cbt@west,cbt@east,cbt@nova0 sudo /usr/bin/fio --ioengine=rbd --clientname=admin --pool=cbt-librbdfio --rbdname=cbt-librbdfio-`hostname -f`-9 --invalidate=0  --rw=write --numjobs=1 --bs=4M --size 20480M --name=cbt-librbdfio-`hostname -f`-file-0  --output-format=json,normal > /dev/null
+00:23:56 - ERROR    - cbt      - During tests
+Traceback (most recent call last):
+  File "./cbt.py", line 88, in main
+    b.initialize()
+  File "/root/cbt_nas/benchmark/librbdfio.py", line 93, in initialize
+    p.wait()
+  File "/root/cbt_nas/common.py", line 76, in wait
+    self.communicate(continue_if_error=True)
+  File "/root/cbt_nas/common.py", line 66, in communicate
+    raise Exception(str(self)+'\nstdout:\n'+stdoutdata+'\nstderr\n'+stderrdata)
+Exception: checked_Popen args=['pdsh', '-S', '-f', '3', '-R', 'ssh', '-w', 'cbt@west,cbt@east,cbt@nova0', 'sudo /usr/bin/fio --ioengine=rbd --clientname=admin --pool=cbt-librbdfio --rbdname=cbt-librbdfio-`hostname -f`-0 --invalidate=0  --rw=write --numjobs=1 --bs=4M --size 20480M --name=cbt-librbdfio-`hostname -f`-file-0  --output-format=json,normal > /dev/null'] continue_if_error=False rtncode=1
+stdout:
+
+stderr
+nova0: rbd_open failed.
+nova0: fio_rbd_connect failed.
+west: rbd_open failed.
+west: fio_rbd_connect failed.
+east: rbd_open failed.
+east: fio_rbd_connect failed.
+pdsh@nova0: nova0: ssh exited with exit code 1
+pdsh@nova0: west: ssh exited with exit code 1
+pdsh@nova0: east: ssh exited with exit code 1
+
+>>>>>>>>>>
+cleaning remote dir /home/cbt/cbt/00000000/LibrbdFio/osd_ra-00004096/op_size-00004096/concurrent_procs-030/iodepth-032/randread
+nova0: nova0
+west: west
+east: east
+
+['nova0', 'west', 'east']
